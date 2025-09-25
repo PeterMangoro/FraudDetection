@@ -86,7 +86,12 @@ Key packages used:
 
 ```
 FraudDetection/
-├── FraudDetection.ipynb          # Main analysis notebook
+├── FraudDetection.ipynb          # Jupyter notebook analysis
+├── streamlit_app.py              # Main Streamlit web application
+├── data_processing.py            # Data processing and ML pipeline
+├── visualizations.py             # Visualization functions
+├── run_streamlit.py              # Python launcher script
+├── run_streamlit.bat             # Windows batch launcher
 ├── kenya_fraud_detection.csv     # Dataset
 ├── requirements.txt              # Python dependencies
 ├── setup_environment.bat         # Environment setup script
@@ -96,11 +101,32 @@ FraudDetection/
 
 ## 🚀 Usage
 
-1. **Data Exploration**: Understand the dataset structure and quality
-2. **Feature Engineering**: Create meaningful features for fraud detection
-3. **Model Training**: Train the Isolation Forest algorithm
-4. **Analysis**: Interpret results and identify fraud patterns
-5. **Visualization**: Create charts and insights
+### Option 1: Interactive Web Dashboard (Recommended)
+1. **Run the Streamlit App**:
+   ```bash
+   # Windows
+   run_streamlit.bat
+   
+   # Or manually
+   streamlit run streamlit_app.py
+   ```
+2. **Open your browser** to `http://localhost:8501`
+3. **Interact with the dashboard** - adjust parameters, explore visualizations, and analyze fraud patterns
+
+### Option 2: Jupyter Notebook Analysis
+1. **Open the notebook**:
+   ```bash
+   jupyter notebook FraudDetection.ipynb
+   ```
+2. **Run all cells** to see the complete analysis
+3. **Explore the code** and modify parameters as needed
+
+### Dashboard Features:
+- **Real-time Parameter Tuning**: Adjust model parameters and see immediate results
+- **Interactive Visualizations**: Zoom, filter, and explore fraud patterns
+- **Multiple Analysis Views**: Transaction, geographic, temporal, and user analysis
+- **Export Capabilities**: Download suspicious transactions and reports
+- **Professional Interface**: Clean, intuitive dashboard design
 
 ## 🔍 Key Insights
 
