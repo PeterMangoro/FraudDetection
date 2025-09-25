@@ -205,6 +205,84 @@ def create_user_risk_chart(high_risk_users):
     
     return fig
 
+def create_sim_swapped_analysis(df_fraud):
+    """Create analysis of SIM swapped transactions"""
+    if df_fraud.empty or 'is_sim_recently_swapped' not in df_fraud.columns:
+        return None
+    
+    try:
+        sim_counts = df_fraud['is_sim_recently_swapped'].value_counts().reset_index()
+        sim_counts.columns = ['is_sim_recently_swapped', 'count']
+        sim_counts['is_sim_recently_swapped'] = sim_counts['is_sim_recently_swapped'].map({0: 'No', 1: 'Yes'})
+        
+        fig = px.bar(
+            sim_counts,
+            x='is_sim_recently_swapped',
+            y='count',
+            title="Fraud Transactions by SIM Swapped Status",
+            labels={
+                'is_sim_recently_swapped': 'SIM Recently Swapped',
+                'count': 'Number of Fraudulent Transactions'
+            },
+            color='is_sim_recently_swapped',
+            color_discrete_map={'No': 'lightblue', 'Yes': 'orange'}
+        )
+        
+        fig.update_layout(height=400)
+        return fig
+    except Exception as e:
+        print(f"Error creating SIM swapped analysis: {e}")
+        return None
+
+def create_fraud_by_network_provider_chart(df_fraud):
+    """Create chart showing fraud by network provider"""
+    if df_fraud.empty or 'network_provider' not in df_fraud.columns:
+        return None
+    
+    try:
+        provider_counts = df_fraud['network_provider'].value_counts().reset_index()
+        provider_counts.columns = ['network_provider', 'count']
+        
+        fig = px.bar(
+            provider_counts,
+            x='network_provider',
+            y='count',
+            title="Fraud Transactions by Network Provider",
+            labels={
+                'network_provider': 'Network Provider',
+                'count': 'Number of Fraudulent Transactions'
+            }
+        )
+        
+        fig.update_layout(height=400)
+        return fig
+    except Exception as e:
+        print(f"Error creating network provider chart: {e}")
+        return None
+
+def create_anomaly_score_distribution(df_model):
+    """Create distribution of anomaly scores"""
+    try:
+        fig = px.histogram(
+            df_model,
+            x='anomaly_score',
+            color='is_fraud_predicted',
+            color_discrete_map={0: 'blue', 1: 'red'},
+            title='Distribution of Anomaly Scores',
+            labels={
+                'anomaly_score': 'Anomaly Score',
+                'count': 'Number of Transactions',
+                'is_fraud_predicted': 'Status'
+            },
+            nbins=50
+        )
+        
+        fig.update_layout(height=400)
+        return fig
+    except Exception as e:
+        print(f"Error creating anomaly score distribution: {e}")
+        return None
+
 def create_summary_metrics_display(fraud_summary):
     """Create summary metrics display"""
     import streamlit as st

@@ -177,7 +177,7 @@ def main():
         
         with col1:
             overview_fig = create_fraud_overview_chart(fraud_summary)
-            st.plotly_chart(overview_fig, use_container_width=True)
+            st.plotly_chart(overview_fig, use_container_width=True, key="fraud_overview")
         
         with col2:
             st.markdown("### 🎯 Key Insights")
@@ -189,11 +189,12 @@ def main():
             """)
         
         # Tabs for different analyses
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
             "🔍 Transaction Analysis", 
             "📍 Geographic Patterns", 
             "⏰ Temporal Analysis", 
             "👥 User Risk Profiles", 
+            "📊 Additional Analysis",
             "🚨 Suspicious Transactions"
         ])
         
@@ -204,11 +205,18 @@ def main():
             
             with col1:
                 scatter_fig = create_amount_scatter_plot(df_model)
-                st.plotly_chart(scatter_fig, use_container_width=True)
+                st.plotly_chart(scatter_fig, use_container_width=True, key="amount_scatter")
             
             with col2:
                 box_fig = create_amount_distribution_boxplot(df_model)
-                st.plotly_chart(box_fig, use_container_width=True)
+                st.plotly_chart(box_fig, use_container_width=True, key="amount_boxplot")
+            
+            # Anomaly score distribution
+            st.markdown("### Anomaly Score Distribution")
+            score_dist_fig = create_anomaly_score_distribution(df_model)
+            if score_dist_fig:
+                st.plotly_chart(score_dist_fig, use_container_width=True, key="anomaly_distribution")
+                st.write("Lower anomaly scores indicate higher likelihood of fraud.")
             
             # Fraud patterns by transaction type
             st.markdown("### Transaction Type Analysis")
@@ -220,7 +228,7 @@ def main():
                 if 'transaction_type' in patterns:
                     type_fig = create_fraud_by_category_chart(patterns, 'transaction_type')
                     if type_fig:
-                        st.plotly_chart(type_fig, use_container_width=True)
+                        st.plotly_chart(type_fig, use_container_width=True, key="transaction_type_rates")
                     else:
                         st.info("Transaction type analysis not available")
             
@@ -229,7 +237,7 @@ def main():
                 df_fraud = df_original[df_model['is_fraud_predicted'] == 1]
                 count_fig = create_fraud_count_by_type_chart(df_fraud)
                 if count_fig:
-                    st.plotly_chart(count_fig, use_container_width=True)
+                    st.plotly_chart(count_fig, use_container_width=True, key="transaction_type_counts")
                 else:
                     st.info("Fraud count by type not available")
         
@@ -242,7 +250,7 @@ def main():
                 if 'location' in patterns:
                     location_fig = create_fraud_by_category_chart(patterns, 'location')
                     if location_fig:
-                        st.plotly_chart(location_fig, use_container_width=True)
+                        st.plotly_chart(location_fig, use_container_width=True, key="location_rates")
                     else:
                         st.info("Location analysis not available")
             
@@ -250,9 +258,18 @@ def main():
                 if 'network_provider' in patterns:
                     provider_fig = create_fraud_by_category_chart(patterns, 'network_provider')
                     if provider_fig:
-                        st.plotly_chart(provider_fig, use_container_width=True)
+                        st.plotly_chart(provider_fig, use_container_width=True, key="network_provider_rates")
                     else:
                         st.info("Network provider analysis not available")
+            
+            # SIM swapped analysis
+            st.markdown("### SIM Swapped Analysis")
+            df_fraud = df_original[df_model['is_fraud_predicted'] == 1]
+            sim_fig = create_sim_swapped_analysis(df_fraud)
+            if sim_fig:
+                st.plotly_chart(sim_fig, use_container_width=True, key="sim_swapped_analysis")
+            else:
+                st.info("SIM swapped analysis not available")
         
         with tab3:
             st.markdown('<h3 class="section-header">Temporal Fraud Patterns</h3>', unsafe_allow_html=True)
@@ -261,13 +278,13 @@ def main():
             
             with col1:
                 timeline_fig = create_timeline_chart(df_model)
-                st.plotly_chart(timeline_fig, use_container_width=True)
+                st.plotly_chart(timeline_fig, use_container_width=True, key="timeline_chart")
             
             with col2:
                 if 'time_of_day' in patterns:
                     time_fig = create_fraud_by_category_chart(patterns, 'time_of_day')
                     if time_fig:
-                        st.plotly_chart(time_fig, use_container_width=True)
+                        st.plotly_chart(time_fig, use_container_width=True, key="time_of_day_analysis")
                     else:
                         st.info("Time of day analysis not available")
         
@@ -282,13 +299,13 @@ def main():
             with col1:
                 user_fig = create_user_risk_chart(high_risk_users)
                 if user_fig:
-                    st.plotly_chart(user_fig, use_container_width=True)
+                    st.plotly_chart(user_fig, use_container_width=True, key="user_risk_chart")
             
             with col2:
                 if 'device_type' in patterns:
                     device_fig = create_fraud_by_category_chart(patterns, 'device_type')
                     if device_fig:
-                        st.plotly_chart(device_fig, use_container_width=True)
+                        st.plotly_chart(device_fig, use_container_width=True, key="device_type_analysis")
                     else:
                         st.info("Device type analysis not available")
             
@@ -296,9 +313,30 @@ def main():
             st.markdown("### Risk Score Heatmap")
             heatmap_fig = create_risk_heatmap(df_model, show_suspicious_count)
             if heatmap_fig:
-                st.plotly_chart(heatmap_fig, use_container_width=True)
+                st.plotly_chart(heatmap_fig, use_container_width=True, key="risk_heatmap_tab4")
         
         with tab5:
+            st.markdown('<h3 class="section-header">Additional Analysis</h3>', unsafe_allow_html=True)
+            
+            # Network provider analysis
+            st.markdown("### Network Provider Fraud Analysis")
+            df_fraud = df_original[df_model['is_fraud_predicted'] == 1]
+            network_fig = create_fraud_by_network_provider_chart(df_fraud)
+            if network_fig:
+                st.plotly_chart(network_fig, use_container_width=True, key="network_provider_counts")
+            else:
+                st.info("Network provider analysis not available")
+            
+            # Risk heatmap
+            st.markdown("### Risk Score Heatmap")
+            heatmap_fig = create_risk_heatmap(df_model, show_suspicious_count)
+            if heatmap_fig:
+                st.plotly_chart(heatmap_fig, use_container_width=True, key="risk_heatmap_tab5")
+                st.write("Heatmap showing risk scores for top suspicious transactions across different features.")
+            else:
+                st.info("Risk heatmap not available")
+        
+        with tab6:
             st.markdown('<h3 class="section-header">Top Suspicious Transactions</h3>', unsafe_allow_html=True)
             
             # Get suspicious transactions
